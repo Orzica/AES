@@ -59,7 +59,7 @@ begin
             if (enable = '1') then
                 plain_text_reg <= plain_text;
                 key_reg        <= key;
-                done_reg       <= enable;
+                done_reg       <= '1';
             else
                 done_reg       <= '0';
             end if;
