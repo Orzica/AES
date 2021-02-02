@@ -3,29 +3,19 @@ use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
 
 
-entity Rounds is
+entity Encript_Round is
 --  Generic ( );
 --  Port ( );
     port(
         input   : in    std_logic_vector(127 downto 0);  -- Round Input
-        key_in  : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
-        key_out : out   std_logic_vector(127 downto 0);  -- Round Key for a specific round
-        rcon    : in    std_logic_vector(7   downto 0);    -- Rcon for Key Schedule
+        key     : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
         output  : out   std_logic_vector(127 downto 0)   -- Output Round
     );
-end Rounds;
+end Encript_Round;
 
-architecture rtl of Rounds is
+architecture rtl of Encript_Round is
 
     -- Declarative zone of VHDL
-
-    component KeySchedule is
-        port(
-            cipher_key : in  std_logic_vector(127 downto 0);
-            rcon       : in  std_logic_vector(  7 downto 0);
-            round_key  : out std_logic_vector(127 downto 0)
-        );
-    end component;
     
     component AddRoundKey is
         port(
@@ -35,7 +25,7 @@ architecture rtl of Rounds is
         );
     end component;
     
-    component Subbytes is
+    component SubBytes is
         port(
             a : in  std_logic_vector(127 downto 0); -- In
             b : out std_logic_vector(127 downto 0)  -- Out
@@ -49,7 +39,7 @@ architecture rtl of Rounds is
         );
     end component;
     
-    component MixColums is
+    component MixColumns is
         port(
             a : in  std_logic_vector(127 downto 0);
             b : out std_logic_vector(127 downto 0)
@@ -57,15 +47,13 @@ architecture rtl of Rounds is
     end component;
     
     signal out_SubBytes, out_ShiftRows, out_MixCoulumns, out_AddRoundKey : std_logic_vector(127 downto 0) := (others => '0');
-    signal key : std_logic_vector(127 downto 0) := (others => '0');
 
 begin
         
        -- Out signal assigment
-       key_out <= key;
        output  <= out_AddRoundKey;
     
-       Subbytes_step : Subbytes
+       Subbytes_step : SubBytes
         port map(
             a => input,
             b => out_SubBytes
@@ -77,24 +65,18 @@ begin
             b => out_ShiftRows 
         );
         
-       MixColums_step : MixColums
+       MixColumns_step : MixColumns
         port map(
             a => out_ShiftRows,
             b => out_MixCoulumns
         );
         
-       KeySchedule_step : KeySchedule
-        port map(
-           cipher_key => key_in,
-           rcon       => rcon,
-           round_key  => key
-        );
         
        AddRoundKey_step : AddRoundKey
         port map(
-           a => out_MixCoulumns,
+           a   => out_MixCoulumns,
            key => key,
-           b => out_AddRoundKey
+           b   => out_AddRoundKey
         );
     
 

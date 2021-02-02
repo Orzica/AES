@@ -2,14 +2,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
 
-entity MixColums is
+entity MixColumns is
 --  Generic ( );
 --  Port ( );
     port(
         a : in  std_logic_vector(127 downto 0);
         b : out std_logic_vector(127 downto 0)
     );
-end MixColums;
+end MixColumns;
 
    ---------------------     -------------            --------------------- 
 -- s0  | s4  | s8  | s12     2 | 3 | 1 | 1            p0  | p4  | p8  | p12
@@ -21,7 +21,7 @@ end MixColums;
 -- s3 |  s7  | s11 | s15     3 | 1 | 1 | 2            p3  |  p7 | p11 | p15
    ---------------------     -------------            ---------------------
 
-architecture rtl of MixColums is
+architecture rtl of MixColumns is
 
     -- Declarative zone of VHDL
     

@@ -2,31 +2,19 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
 
-entity last_round is
+entity Encript_Last_Round is
 --  Generic ( );
 --  Port ( );
     port(
         input   : in    std_logic_vector(127 downto 0);  -- Round Input
-        key_in  : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
-        key_out : out   std_logic_vector(127 downto 0);  -- Round Key for a specific round
-        rcon    : in    std_logic_vector(7   downto 0);    -- Rcon for Key Schedule
+        key     : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
         output  : out   std_logic_vector(127 downto 0)   -- Output Round
     );
-end last_round;
+end Encript_Last_Round;
 
-architecture rtl of last_round is
+architecture rtl of Encript_Last_Round is
 
     -- Declarative zone of VHDL
-    
-    signal key : std_logic_vector(127 downto 0) := (others => '0');
-    
-    component KeySchedule is
-        port(
-            cipher_key : in  std_logic_vector(127 downto 0);
-            rcon       : in  std_logic_vector(  7 downto 0);
-            round_key  : out std_logic_vector(127 downto 0)
-        );
-    end component;
     
     component AddRoundKey is
         port(
@@ -54,7 +42,6 @@ architecture rtl of last_round is
 
 begin
     
-       key_out <= key;
        output  <= out_AddRoundKey;
 
        Subbytes_step : Subbytes
@@ -69,18 +56,12 @@ begin
             b => out_ShiftRows 
         );
         
-       KeySchedule_step : KeySchedule
-        port map(
-           cipher_key => key_in,
-           rcon       => rcon,
-           round_key  => key
-        );
         
        AddRoundKey_step : AddRoundKey
         port map(
-           a => out_ShiftRows,
+           a   => out_ShiftRows,
            key => key,
-           b => out_AddRoundKey
+           b   => out_AddRoundKey
         );
 
 end rtl;

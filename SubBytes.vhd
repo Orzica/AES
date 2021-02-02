@@ -2,14 +2,14 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.NUMERIC_STD.ALL;
 
-entity Subbytes is
+entity SubBytes is
 --  Generic ( );
 --  Port ( );
     port(
         a : in  std_logic_vector(127 downto 0); -- In
         b : out std_logic_vector(127 downto 0)  -- Out
     );
-end Subbytes;
+end SubBytes;
 
 --  00 | 12 | 0C | 08   SubByte     63 | C9 | FE | 30
     -----------------               -----------------
@@ -19,7 +19,7 @@ end Subbytes;
     -----------------               -----------------
 --  14 | 00 | 11 | 19               FA | 63 | 82 | D4
 
-architecture rtl of Subbytes is
+architecture rtl of SubBytes is
 
     -- Declarative zone of VHDL
     type byte is array (0 to 255) of std_logic_vector(7 downto 0);

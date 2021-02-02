@@ -2,21 +2,20 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 use IEEE.numeric_std.ALL;
 
-
-entity AES_ENC is
+entity AES_DEC is
 --  Generic ( );
 --  Port ( );
     port(
-        plain_text  : in  std_logic_vector(127 downto 0);
+        cipher_text : in  std_logic_vector(127 downto 0);
         key         : in  std_logic_vector(127 downto 0);
-        cipher_text : out std_logic_vector(127 downto 0)
+        plain_text  : out std_logic_vector(127 downto 0)
     );
-end AES_ENC;
+end AES_DEC;
 
-architecture rtl of AES_ENC is
+architecture rtl of AES_DEC is
 
     -- Declarative zone of VHDL
-    
+    -- cipher_text <= x"004488cc115599dd2266aaee3377bbff";
     -- Components declaration
     
     type byte is array(0 to 9) of std_logic_vector(7 downto 0);
@@ -24,6 +23,11 @@ architecture rtl of AES_ENC is
     
     type out_k is array(0 to 9) of std_logic_vector(127 downto 0);
     signal out_key : out_k := (others => (others => '0'));
+    
+    signal out_initial_round : std_logic_vector(127 downto 0) := (others => '0'); -- Out round one
+    
+    type out_rounds is array(0 to 8) of std_logic_vector(127 downto 0); -- 
+    signal out_r : out_rounds := (others => (others => '0'));
     
     component AddRoundKey is
         port(
@@ -33,7 +37,7 @@ architecture rtl of AES_ENC is
         );
     end component;
     
-    component Encript_Round is
+    component Decript_Round is
         port(
             input   : in    std_logic_vector(127 downto 0);  -- Round Input
             key     : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
@@ -41,18 +45,13 @@ architecture rtl of AES_ENC is
         );
     end component;
     
-    component Encript_Last_Round is
+    component Decript_Last_Round is
         port(
             input   : in    std_logic_vector(127 downto 0);  -- Round Input
-            key     : in    std_logic_vector(127 downto 0);  -- Key input for RoundKey Generator
+            key_in  : in    std_logic_vector(127 downto 0);  -- Key input for Last Round ( Original Key )
             output  : out   std_logic_vector(127 downto 0)   -- Output Round
-        );    
+        );
     end component;
-    
-    signal out_initial_round : std_logic_vector(127 downto 0) := (others => '0'); -- Out round one
-           
-    type out_rounds is array(0 to 8) of std_logic_vector(127 downto 0); -- 
-    signal out_r : out_rounds := (others => (others => '0')); -- Out of 9 main rounds out_r(8)
     
    component KeySchedule is
         port(
@@ -61,13 +60,10 @@ architecture rtl of AES_ENC is
             round_key  : out std_logic_vector(127 downto 0)
         );
     end component;
-            
+    
 begin
 
-    -- plain_text => x"328831e0435a3137f6309807a88da234";
-    -- key        => x"2b28ab097eaef7cf15d2154f16a6883c";
-
-   r1_key: KeySchedule
+    r1_key: KeySchedule
         port map(
             cipher_key => key,
             rcon       => rcon(0),
@@ -136,88 +132,88 @@ begin
             rcon       => rcon(9),
             round_key  => out_key(9)
         );
-            
-    Encript_Initial_Round : AddRoundKey
-        port map(a => plain_text, key => key, b => out_initial_round);
-               
+
+    Decript_Initial_Round : AddRoundKey
+        port map(a => cipher_text, key => out_key(9), b => out_initial_round);
+        
       ----------Round 1------------
-    r1 : Encript_Round
+    r1 : Decript_Round
         port map(
             input   => out_initial_round,
-            key     => out_key(0), -- Based on key_in, we generate the round key for next round
+            key     => out_key(8),
             output  => out_r(0)
-        ); 
-        
-      ----------Round 2------------
-    r2 : Encript_Round
+        );
+      
+      ----------Round 2------------      
+    r2 : Decript_Round
         port map(
             input   => out_r(0),
-            key     => out_key(1),
+            key     => out_key(7),
             output  => out_r(1)
-        ); 
+        );
         
-      ----------Round 3------------
-    r3 : Encript_Round
+      ----------Round 3------------      
+    r3 : Decript_Round
         port map(
             input   => out_r(1),
-            key     => out_key(2),
+            key     => out_key(6),
             output  => out_r(2)
-        ); 
+        );
         
-      ----------Round 4------------
-    r4 : Encript_Round
+      ----------Round 4------------      
+    r4 : Decript_Round
         port map(
             input   => out_r(2),
-            key     => out_key(3),
+            key     => out_key(5),
             output  => out_r(3)
         );
         
-      ----------Round 5------------
-    r5 : Encript_Round
+      ----------Round 5------------      
+    r5 : Decript_Round
         port map(
             input   => out_r(3),
             key     => out_key(4),
             output  => out_r(4)
         );
         
-      ----------Round 6------------
-    r6 : Encript_Round
+      ----------Round 6------------      
+    r6 : Decript_Round
         port map(
             input   => out_r(4),
-            key     => out_key(5),
+            key     => out_key(3),
             output  => out_r(5)
         );
         
-      ----------Round 7------------
-    r7 : Encript_Round
+      ----------Round 7------------      
+    r7 : Decript_Round
         port map(
             input   => out_r(5),
-            key     => out_key(6),
+            key     => out_key(2),
             output  => out_r(6)
         );
         
-      ----------Round 8------------
-    r8 : Encript_Round
+      ----------Round 8------------      
+    r8 : Decript_Round
         port map(
             input   => out_r(6),
-            key     => out_key(7),
+            key     => out_key(1),
             output  => out_r(7)
         );
         
-      ----------Round 9------------
-    r9 : Encript_Round
+      ----------Round 9------------      
+    r9 : Decript_Round
         port map(
             input   => out_r(7),
-            key     => out_key(8),
+            key     => out_key(0),
             output  => out_r(8)
         );
         
-     ----------Round 9------------   
-    r10 : Encript_Last_Round
+      ----------Round 10-----------      
+    r10 : Decript_Last_Round
         port map(
             input   => out_r(8),
-            key     => out_key(9),
-            output  => cipher_text
+            key_in  => key,
+            output  => plain_text
         );
 
 end rtl;
