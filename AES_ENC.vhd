@@ -212,7 +212,7 @@ begin
             output  => out_r(8)
         );
         
-     ----------Round 9------------   
+     ----------Round 10-----------   
     r10 : Encript_Last_Round
         port map(
             input   => out_r(8),
