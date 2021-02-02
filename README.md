@@ -1,8 +1,8 @@
-Hardware Implementation of Advanced Encryption Standard Algorithm
+<h1>Hardware Implementation of Advanced Encryption Standard Algorithm</h1>
 
 Advenced Ecryption Standard (AES), a Federal Information Processing Standard (FIPS), is an approved cryptographic algoritm that can be used to protect eletronic data.
 
-High-level description of the algorithm
+<h2>High-level description of the algorithm</h2>
 
     KeyExpansion – round keys are derived from the cipher key using the AES key schedule. AES requires a separate 128-bit round key block for each round plus one more.
     Initial round key addition:
